@@ -6,7 +6,8 @@ output:
 ---
 
 ## Loading and preprocessing the data
-```{r}
+
+```r
 # Install Packages
 library(dplyr)
 library(ggplot2)
@@ -21,11 +22,11 @@ unzip("ActivityMonitoringSource.zip")
 
 #Load the activity csv.
 activityRaw <-  read.table(file = "activity.csv",header = TRUE, stringsAsFactors = FALSE ,sep = ",")
-
 ```
 
 ## What is mean total number of steps taken per day?
-```{r}
+
+```r
 # Remove missing Values.
 activityNoNA <- na.omit(activityRaw) 
 
@@ -36,19 +37,22 @@ stepsPerDay <- summarize(by_date, steps = sum(steps))
 
 # Create Histogram
 hist(x = stepsPerDay$steps, main = "Histogram of Steps per Day",xlab = "Steps")
+```
 
+![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2-1.png) 
+
+```r
 # Calculate the mean and median of the steps.
 meanSteps = as.integer(mean(x = stepsPerDay$steps))
 medianSteps = as.integer(median(x = stepsPerDay$steps))
-
-
 ```
 **Mean and Median of Steps per Day**  
-Mean steps: `r meanSteps`  
-Median steps: `r medianSteps`  
+Mean steps: 10766  
+Median steps: 10765  
 
 ## What is the average daily activity pattern?
-```{r}
+
+```r
 # Use dplyr to group by interval.
 activity <- tbl_df(data = activityNoNA)
 by_interval <- group_by(.data = activity, interval)
@@ -62,22 +66,26 @@ lp <- ggplot(data=avgStepsPerInterval,
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) # Rotate X Axis text.
 
 lp
+```
 
+![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3-1.png) 
+
+```r
 #Determine which interval has the highest average steps.
 maxStepInterval <- avgStepsPerInterval$interval[which(avgStepsPerInterval$steps == max(avgStepsPerInterval$steps))]
-
 ```
 **Interval with greatest average steps**  
-Interval: `r maxStepInterval`  
+Interval: 835  
 
 ## Imputing missing values
-```{r}
+
+```r
 countofNA <- sum(is.na(activityRaw))
 ```
 Total number of missing values (rows) is `r countofNA  
 
-```{r}
 
+```r
 # Create a new data set (data frame) to replace NA values.
 activityReplaceNA <- activityRaw
 
@@ -97,18 +105,22 @@ stepsPerDay <- summarize(by_date, steps = sum(steps))
 
 # Create Histogram
 hist(x = stepsPerDay$steps, main = "Histogram of Steps per Day",xlab = "Steps")
+```
 
+![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5-1.png) 
+
+```r
 # Calculate the mean and median of the steps.
 meanSteps = as.integer(mean(x = stepsPerDay$steps))
 medianSteps = as.integer(median(x = stepsPerDay$steps))
-
 ```
 **Mean and Median of Steps per Day**  
-Mean steps: `r meanSteps`  
-Median steps: `r medianSteps`  
+Mean steps: 84188  
+Median steps: 11458  
 
 ## Are there differences in activity patterns between weekdays and weekends?
-```{r}
+
+```r
 # Use dplyr to add the weekday field, group and summerize.
 activity <- tbl_df(data = activityReplaceNA)
 activityDayAdded <- mutate(.data = activity,day = ifelse (weekdays(as.Date(date, format="%Y-%m-%d")) %in% c("Saturday", "Sunday"), "weekend", "weekday")) %>%
@@ -129,6 +141,8 @@ ggplot(data=activityDayAdded,
     ggtitle("Activity Patterns") +
     facet_wrap(~ day, scales = "free", ncol = 1)
 ```
+
+![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-1.png) 
 
 
 
